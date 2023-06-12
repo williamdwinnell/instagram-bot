@@ -8,6 +8,16 @@ Planned Features:
  - detect device activity and avoid running during active times
 '''
 
+global URL_X, URL_Y
+URL_X = 250
+URL_Y = 70
+
+global like_X, like_Y
+LIKE_X = 281
+LIKE_Y = 504
+
+
+
 from cgi import test
 from pynput.mouse import Button, Controller
 mouse = Controller()
@@ -18,6 +28,49 @@ keyboard = Controller()
 import time
 import random
 import pyautogui
+
+
+def check_chrome_fullscreen():
+    # Get the Chrome window
+    windows = pyautogui.getWindowsWithTitle('Google Chrome')
+    
+    if len(windows) == 0:
+        return False
+
+    window = windows[0]
+
+    # Get the current active window's position and size
+    window_left = window.left
+    window_top = window.top
+    window_width = window.width
+    window_height = window.height
+
+    # Get the screen size
+    screen_width, screen_height = pyautogui.size()
+
+    # Check if Chrome is in full-screen mode
+    if (
+        window_left == 0
+        and window_top == 0
+        and window_width == screen_width
+        and window_height == screen_height
+    ):
+        return True
+
+    return False
+
+def exit_chrome_fullscreen():
+    # Activate the Chrome window
+    windows = pyautogui.getWindowsWithTitle('Google Chrome')
+
+    if len(windows) == 0:
+        return
+
+    window = windows[0]
+    window.activate()
+
+    # Send the F11 key to exit full-screen mode
+    pyautogui.press('f11')
 
 def move_and_click(x, y, clicks):
     mouse.position = (x, y)
@@ -40,7 +93,7 @@ def start_program(name):
     
 def goto_url(url):
     time.sleep(.5)
-    mouse.position = (250, 70)
+    mouse.position = (URL_X, URL_Y)
     mouse.click(Button.left, 2)
     keyboard.press(Key.ctrl.value)
     keyboard.press('a')
@@ -67,12 +120,11 @@ def like_most_recent_from_hashtag(hashtag, like_count, testing=False):
     time.sleep(1)
     move_and_click(295, 660, 1)
     time.sleep(2)
-    mouse.position = (471, 414)
+    mouse.position = (LIKE_X, LIKE_Y)
     for i in range(like_count):
-
         if testing==False:
             #like the post
-            move_and_click(471, 414, 2)
+            move_and_click(LIKE_X, LIKE_Y, 2)
 
         #wait for like action to register
         time.sleep(random.randint(1,2))
@@ -86,8 +138,9 @@ def like_most_recent_from_hashtag(hashtag, like_count, testing=False):
 
         #before going to the next post make sure chrome is not in fullscreen
         if pyautogui.pixelMatchesColor(1200, 25, (43, 55, 61)) == False:
-            keyboard.press(Key.f11)
-            keyboard.release(Key.f11)
+            print()
+            #keyboard.press(Key.f11)
+            #keyboard.release(Key.f11)
         
         time.sleep(1)
     
@@ -98,15 +151,20 @@ def like_most_recent_from_hashtag(hashtag, like_count, testing=False):
     keyboard.press(Key.right)
     keyboard.release(Key.right)
 
-    #before going to the next post make sure chrome is not in fullscreen
+    '''#before going to the next post make sure chrome is not in fullscreen
     if pyautogui.pixelMatchesColor(1200, 25, (43, 55, 61)) == False:
         keyboard.press(Key.f11)
-        keyboard.release(Key.f11)
+        keyboard.release(Key.f11)'''
+    is_fullscreen = check_chrome_fullscreen()
+    if is_fullscreen:
+        print("Chrome is in full-screen mode. Exiting full screen...")
+        exit_chrome_fullscreen()
 
 ###ADJUSTABLE VARIABLES###
 
 #Hashtags to like the 'most recent' posts (make these relevant to your insta page) 
-todo_tags = [ "anime", "animelover", "animegirl", "animeart", "animefan", "animefans", "animecommunity", "animeworld", "animenation", "like4likes" ]
+todo_tags = ["photography", "nature", "naturephotography", "landscape", "outdoors", "wildlife", "exploreoutdoors", "adventure", "scenic", "beautiful", "naturelovers", "hikingadventures", "mountainviews", "waterfallwonders", "sunrise_sunset", "reflectiongram", "wildlifephotographer", "travelcaptures", "wanderlustsoul", "discoverearth", "earthpix", "getoutsideandplay", "capturingmoments", "amazingviewpoints", "instanature", "beautyofnature", "natureshots", "naturalbeauty", "earthfocus", "visualsofearth"]
+            #[ "anime", "animelover", "animegirl", "animeart", "animefan", "animefans", "animecommunity", "animeworld", "animenation", "like4likes" ]
             #"anime", "animefans", "manga", "aiart", "painting", "instaart"
 
 ###NOTES###
@@ -174,10 +232,15 @@ if hypo_daily_max < 3000 or session_restraint == False:
                 time.sleep(3)
             print()
 
-            #before going to the next post make sure chrome is not in fullscreen
+            '''#before going to the next post make sure chrome is not in fullscreen
             if pyautogui.pixelMatchesColor(1200, 25, (43, 55, 61)) == False:
-                keyboard.press(Key.f11)
-                keyboard.release(Key.f11)
+                #keyboard.press(Key.f11)
+                #keyboard.release(Key.f11)
+                print()'''
+            is_fullscreen = check_chrome_fullscreen()
+            if is_fullscreen:
+                print("Chrome is in full-screen mode. Exiting full screen...")
+                exit_chrome_fullscreen()
 
             #exit chrome to clean things up
             move_and_click(1875, 10, 1)
